@@ -50,30 +50,16 @@
                         }
                     }
                     if (e.which === 8 || e.which === 46) {
-                        /*var temp = currentObject;
-                         for(var c in currentObject.items){
-                         objects.exclude(temp[c]);
-                         temp[c].remove();
-                         //alert("pene");
-                         }*/
-
-                        /*temp.forEach(function(e){
-                         objects.exclude(e);
-                         });*/
-
-
-                        /* currentObject.forEach(function (e) {
-                         objects.exclude(e);
-                         });*/
-
                         for (var c in currentObjects.items) {
                             objects.exclude(currentObjects[c]);
                             currentObjects[c].remove();
                         }
 
+                        currentReset();
+
 
                         //currentObject = paper.set();
-                        selec.remove();
+                        //selec.remove();
 
                     }
 
@@ -81,18 +67,54 @@
 
                 // make points draggable
                 var DragStart = function () {
-                    if (selec)
-                        selec.remove();
-                    currentObjects = paper.set();
-                    currentObjects.push(this);
-                    this.ox = this.attr("cx");
-                    this.oy = this.attr("cy");
-                    selectObject(this);
+                    /*if (selec)
+                     selec.remove();*/
+                    if (currentObjects.items.length < 2)
+                        currentReset();
+                    /*this.ox = this.attr("cx");
+                     this.oy = this.attr("cy");*/
+
+                    currentAdd(this);
+
+                    currentObjects.forEach(function (c) {
+                        c.data("ox", c.attr("cx"));
+                        c.data("oy", c.attr("cy"));
+                    });
+                    
+                    currentSelects.forEach(function (c) {
+                        c.data("ox", c.attr("x"));
+                        c.data("oy", c.attr("y"));
+                    });
+
+
+
+                    //selectObject(this);
                     posRestart();
                 },
                         DragMove = function (dx, dy) {
-                            this.attr({cx: this.ox + dx, cy: this.oy + dy});
-                            selec.attr({x: selec.ox + dx, y: selec.oy + dy});
+                            //this.attr({cx: this.data("ox") + dx, cy: this.data("oy") + dy});
+
+
+                            currentObjects.forEach(function (c) {
+                                c.attr({cx: c.data("ox") + dx, cy: c.data("oy") + dy});
+                                //c.data("ox", c.attr("cx"));
+                                //c.data("oy", c.attr("cy"));
+                            });
+
+                            currentSelects.forEach(function (c) {
+                                c.attr({x: c.data("ox") + dx, y: c.data("oy") + dy});
+                                //c.data("ox", c.attr("cx"));
+                                //c.data("oy", c.attr("cy"));
+                            });
+
+                            /*for (var c in currentObjects.items) {
+                             alert(currentObjects[c].data("ox"));
+                             
+                             }*/
+                            /*for (var c in currentSelects) {
+                             c.attr({x: c.ox + dx, y: c.oy + dy});
+                             }*/
+                            //selec.attr({x: selec.ox + dx, y: selec.oy + dy});
                         },
                         DragUp = function () {
                         };
@@ -101,8 +123,8 @@
                 function copyObject(obj) {
 
                     copy = obj.clone();
-                    copy.ox = copy.attr("cx");
-                    copy.oy = copy.attr("cy");
+                    copy.data("ox", copy.attr("cx"));
+                    copy.data("oy", copy.attr("cy"));
 
                     objects.push(copy);
 
@@ -110,33 +132,77 @@
                     return copy;
                 }
 
-                function selectObject(obj) {
-                    var box = obj.getBBox();
-                    selec = paper.rect(box.x, box.y, box.width, box.height);
-                    selec.ox = box.x;
-                    selec.oy = box.y;
-                    selec.attr({'stroke-dasharray': "."});
-                }
+
+                /*function selectObject(obj) {
+                 var box = obj.getBBox();
+                 selec = paper.rect(box.x, box.y, box.width, box.height);
+                 selec.ox = box.x;
+                 selec.oy = box.y;
+                 selec.attr({'stroke-dasharray': "."});
+                 }*/
 
                 // make points draggable-copyable
                 var copy;
-                var selec;
+                //var selec = paper.set;
                 var currentObjects = paper.set();
-                var start = function () {
-                    if (selec)
-                        selec.remove();
-                    selectObject(copyObject(this));
+                var currentSelects = paper.set();
+
+                function currentReset() {
                     currentObjects = paper.set();
-                    currentObjects.push(copy);
-                    copy.ox = copy.attr("cx");
-                    copy.oy = copy.attr("cy");
+                    for (var c in currentSelects.items) {
+                        currentSelects[c].remove();
+                    }
+                    currentSelects = paper.set();
+                }
+
+                function currentAdd(obj) {
+                    currentObjects.push(obj);
+                    var box = obj.getBBox();
+                    var rect = paper.rect(box.x, box.y, box.width, box.height);
+                    rect.data("ox", box.x);
+                    rect.data("oy", box.y);
+                    rect.attr({'stroke-dasharray': "."});
+                    currentSelects.push(rect);
+                }
+
+                var start = function () {
+                    /*if (selec)
+                     for (var c in selec.items) {
+                     selec[c].remove();
+                     }*/
+                    //selec.remove();
+                    copyObject(this);
+                    currentReset();
+                    copy.data("ox", copy.attr("cx"));
+                    copy.data("oy", copy.attr("cy"));
+                    currentAdd(copy);
                     posRestart();
                 },
                         move = function (dx, dy) {
-                            copy.attr({cx: copy.ox + dx, cy: copy.oy + dy});
-                            selec.attr({x: selec.ox + dx, y: selec.oy + dy});
+                            //copy.attr({cx: copy.ox + dx, cy: copy.oy + dy});
+                            currentObjects.forEach(function (c) {
+                                c.attr({cx: c.data("ox") + dx, cy: c.data("oy") + dy});
+                                /*c.data("incX", c.attr("cx"));
+                                 c.data("incY", c.attr("cy"));*/
+                            });
+                            currentSelects.forEach(function (c) {
+                                c.attr({x: c.data("ox") + dx, y: c.data("oy") + dy});
+                                //c.data("ox", c.attr("cx"));
+                                //c.data("oy", c.attr("cy"));
+                            });
+                            /*for (var c in currentObjects) {
+                             c.attr({cx: c.ox + dx, cy: c.oy + dy});
+                             }
+                             for (var c in currentSelects) {
+                             c.attr({x: c.ox + dx, y: c.oy + dy});
+                             }*/
+                            //selec.attr({x: selec.ox + dx, y: selec.oy + dy});
                         },
                         up = function () {
+                            /*currentObjects.forEach(function (c) {
+                             c.data("ox", c.data("incX"));
+                             c.data("oy", c.data("incY"));
+                             });*/
                         };
 
                 paper.set(p1).drag(move, start, up);
@@ -150,8 +216,10 @@
                 //DRAG FUNCTIONS
                 //when mouse goes down over background, start drawing selection box
                 function dragstart(x, y, event) {
-                    if (selec)
-                        selec.remove();
+                    /*if (selec)
+                     for (var c in selec.items) {
+                     selec[c].remove();
+                     }*/
                     box = paper.rect(x - 260, y - 100, 0, 0).attr("stroke", "#9999FF");
                 }
 
@@ -183,7 +251,6 @@
                     //alert(bounds.x + "/" + bounds.y + "\n\n\n\n                                  " + bounds.x2 + "/" + bounds.y2);
 
 
-                    var i = 0;
                     //console.log(bounds);
                     for (var c in objects.items) {
                         //here, we want to get the x,y vales of each object regardless of what sort of shape it is, but rect uses rx and ry, circle uses cx and cy, etc
@@ -197,27 +264,25 @@
                         if (mybounds.x >= bounds.x && mybounds.x <= bounds.x2 || mybounds.x2 >= bounds.x && mybounds.x2 <= bounds.x2) {
                             //same for y
                             if (mybounds.y >= bounds.y && mybounds.y <= bounds.y2 || mybounds.y2 >= bounds.y && mybounds.y2 <= bounds.y2) {
-                                currentObjects.push(objects[c]);
-                                ++i;
+                                currentAdd(objects[c]);
                             }
                         }
 
 
-                        currentObjects.attr("opacity", 0.6);
+                        //currentObjects.attr("opacity", 0.6);
                     }
-                    alert(i);
                 }
 
                 function reset() {
                     //empty selections and reset opacity;
-                    currentObjects = paper.set();
-                    objects.attr("opacity", 1);
+                    currentReset();
+                    //objects.attr("opacity", 1);
                 }
 
                 image.drag(dragmove, dragstart, dragend);
                 /*image.click(function (e) {
-                    //reset();
-                });*/
+                 //reset();
+                 });*/
 
             </script>
         </div>
