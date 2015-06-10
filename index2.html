@@ -1,7 +1,7 @@
 
 <html>
     <head>
-        <script src="raphael-min.js"></script>
+        <script src="raphael-2.1.2.js"></script>
         <script src="jquery-1.11.3.min.js"></script>
         <style>
             * { font-family:arial }
@@ -40,7 +40,10 @@
                     if (e.ctrlKey && (String.fromCharCode(e.which) === 'v' || String.fromCharCode(e.which) === 'V')) {
                         if (currectCopy) {
                             copy = currectCopy.clone();
-                            objects.push(copy);
+                            copy.forEach(function (e) {
+                                objects.push(e);
+                            });
+
                             copy.translate(pos, pos);
                             pos = pos + 10;
                             paper.set(copy).drag(DragMove, DragStart, DragUp);
@@ -57,11 +60,11 @@
                         /*temp.forEach(function(e){
                          objects.exclude(e);
                          });*/
-                       
 
-                       /* currentObject.forEach(function (e) {
-                            objects.exclude(e);
-                        });*/
+
+                        /* currentObject.forEach(function (e) {
+                         objects.exclude(e);
+                         });*/
 
                         for (var c in currentObjects.items) {
                             objects.exclude(currentObjects[c]);
@@ -177,13 +180,10 @@
                     box.remove();
                     reset();
 
-                    /*if(bounds.x > bounds.x2 && bounds.y > bounds.y2){
-                     bounds.x = [bounds.x2, bounds.x2 = bounds.x][0];
-                     bounds.y = [bounds.y2, bounds.y2 = bounds.y][0];
-                     
-                     }*/
+                    //alert(bounds.x + "/" + bounds.y + "\n\n\n\n                                  " + bounds.x2 + "/" + bounds.y2);
 
 
+                    var i = 0;
                     //console.log(bounds);
                     for (var c in objects.items) {
                         //here, we want to get the x,y vales of each object regardless of what sort of shape it is, but rect uses rx and ry, circle uses cx and cy, etc
@@ -193,23 +193,19 @@
                         //do bounding boxes overlap?
                         //is one of this object's x extremes between the selection's xextremes?
 
+
                         if (mybounds.x >= bounds.x && mybounds.x <= bounds.x2 || mybounds.x2 >= bounds.x && mybounds.x2 <= bounds.x2) {
                             //same for y
                             if (mybounds.y >= bounds.y && mybounds.y <= bounds.y2 || mybounds.y2 >= bounds.y && mybounds.y2 <= bounds.y2) {
                                 currentObjects.push(objects[c]);
+                                ++i;
                             }
                         }
-
-                        /*if (mybounds.x >= bounds.x && mybounds.x <= bounds.x2 || mybounds.x2 >= bounds.x && mybounds.x2 <= bounds.x2) {
-                         //same for y
-                         if (mybounds.y >= bounds.y && mybounds.y <= bounds.y2 || mybounds.y2 >= bounds.y && mybounds.y2 <= bounds.y2) {
-                         selections.push(objects[c]);
-                         }
-                         }*/
 
 
                         currentObjects.attr("opacity", 0.6);
                     }
+                    alert(i);
                 }
 
                 function reset() {
@@ -219,9 +215,9 @@
                 }
 
                 image.drag(dragmove, dragstart, dragend);
-                image.click(function (e) {
-                    reset();
-                });
+                /*image.click(function (e) {
+                    //reset();
+                });*/
 
             </script>
         </div>
