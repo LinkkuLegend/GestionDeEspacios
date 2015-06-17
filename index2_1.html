@@ -106,20 +106,24 @@
             // Creates canvas
             var paper = Raphael("canvas1", "100%", "100%");
 
-            var objects = paper.set();
+            var objects = [];
             var selects = paper.set();
             var image = paper.image("reserva-online-tenis-mapa.png", 0, 0, 700, 400);
             var panel = paper.rect(710, 10, 130, 100);
-            var p1 = paper.set(
-                    paper.circle(730, 30, 10).attr("fill", "#0000FF")
-                    );
+            var p1 = {
+                form: paper.circle(730, 30, 10).attr("fill", "#00ee99"),
+                ox: 0,
+                oy: 0
+            };
             //var p2 = paper.path("m 750 21 c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 l 35,0 c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#0000FF");
 
 
-            var p2 = paper.set(
-                    paper.path("m 750 21 c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 l 35,0 c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#0000FF"),
-                    paper.text(760, 29, "Hi")
-                    );
+            var p2 = {
+                form: paper.path("m 750 21 c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 l 35,0 c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#00ee99"),
+                text: paper.text(760, 29, "Hi"),
+                ox: 0,
+                oy: 0
+            };
 
 
 
@@ -182,7 +186,6 @@
 
                 posRestart();
             };
-
             var DragMove = function (dx, dy) {
 
                 currentObjects.forEach(function (c) {
@@ -204,45 +207,53 @@
                 });
             };
             var DragUp = function () {
-                console.log(objects.items.length);
             };
 
 
-            function copyObject(obj) {
-
-                copy = obj.clone();
-                copy.data("ox", 0);
-                copy.data("oy", 0);
-
+            var cloneObj = function (obj) {
+                var formCopy = obj.form.clone();
+                var copy = {};
+                
+                if (obj.text) {
+                    var textCopy = obj.text.clone();
+                    copy = {
+                        form: formCopy,
+                        text: textCopy,
+                        ox: 0, oy: 0
+                    };
+                }else
+                copy = {
+                    form: formCopy,
+                    ox: 0, oy: 0
+                };
+                
                 objects.push(copy);
-
-                paper.set(copy).drag(DragMove, DragStart, DragUp);
                 return copy;
-            }
+            };
+
+
 
             // make points draggable-copyable
-            var copy;
-            var currentObjects = paper.set();
-            var currentSelects = paper.set();
+
+            var currentObjects = [];
+            var currentSelects = [];
 
             function currentReset() {
-                clearState();
-                currentObjects = paper.set();
-                for (var c in currentSelects.items) {
-                    currentSelects[c].remove();
-                }
-                currentSelects = paper.set();
+                //clearState();
+                currentObjects = [];
             }
 
             function currentAdd(obj) {
-                changeColor(obj.attr("fill"));
+                //changeColor(obj.form.attr("fill"));
+                //console.log(currentObjects.length);
                 currentObjects.push(obj);
-                var box = obj.getBBox();
-                var rect = paper.rect(box.x, box.y, box.width, box.height);
-                rect.data("ox", 0);
-                rect.data("oy", 0);
-                rect.attr({'stroke-dasharray': "."});
-                currentSelects.push(rect);
+                //console.log(currentObjects.length);
+                /*var box = obj.form.getBBox();
+                 var rect = paper.rect(box.x, box.y, box.width, box.height);
+                 rect.data("ox", 0);
+                 rect.data("oy", 0);
+                 rect.attr({'stroke-dasharray': "."});
+                 currentSelects.push(rect);*/
             }
 
             var start = function () {
@@ -260,7 +271,6 @@
             var move = function (dx, dy) {
 
                 currentObjects.forEach(function (c) {
-                    //console.log(c.data("ox"), dx);
                     c.attr({
                         transform: "...T" + (dx - c.data("ox")) + "," + (dy - c.data("oy"))
                     });
@@ -280,12 +290,84 @@
 
 
             };
-
             var up = function () {
             };
 
-            paper.set(p1).drag(move, start, up);
-            paper.set(p2).drag(move, start, up);
+            var draggable = function (obj) {
+                var start = function () {
+                    if (currentObjects.length < 2)
+                        currentReset();
+                    currentAdd(obj);
+
+                    for (var i = 0; i < currentObjects.length; i++) {
+                        currentObjects[i].ox = 0;
+                        currentObjects[i].oy = 0;
+                    };
+
+                };
+                var move = function (dx, dy) {
+                    for (var i = 0; i < currentObjects.length; i++) {
+                        currentObjects[i].form.attr({
+                            transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
+                        });
+
+                        if (currentObjects[i].text)
+                            currentObjects[i].text.attr({
+                                transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
+                            });
+
+                        currentObjects[i].ox = dx;
+                        currentObjects[i].oy = dy;
+                    }
+                };
+
+                var up = function () {
+                    console.log(objects.length);
+                };
+
+                obj.form.drag(move, start, up);
+            };
+
+
+            var copyable = function (obj) {
+                //var copy = cloneObj(obj);
+                var start = function () {
+                    var copy = cloneObj(obj);
+                    draggable(copy);
+                    //copy = cloneObj(obj);
+                    currentReset();
+                    copy.ox = 0;
+                    copy.oy = 0;
+                    //alert(copy.form.type);
+                    currentAdd(copy);
+                };
+                var move = function (dx, dy) {
+                    for (var i = 0; i < currentObjects.length; i++) {
+                        currentObjects[i].form.attr({
+                            transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
+                        });
+
+                        if (currentObjects[i].text)
+                            currentObjects[i].text.attr({
+                                transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
+                            });
+
+                        currentObjects[i].ox = dx;
+                        currentObjects[i].oy = dy;
+                    }
+                };
+
+                var up = function () {
+                };
+
+                obj.form.drag(move, start, up);
+            };
+
+            copyable(p1);
+            copyable(p2);
+
+            //paper.set(p1).drag(move, start, up);
+            //paper.set(p2).drag(move, start, up);
 
 
 
@@ -298,7 +380,6 @@
             function dragstart(x, y, event) {
                 box = paper.rect(x - 260, y - 100, 0, 0).attr("stroke", "#9999FF");
             }
-
             //when mouse moves during drag, adjust box. If to left or above original point, you have to translate the whole box and invert the dx or dy values since .rect() doesn't take negative width or height
             function dragmove(dx, dy, x, y, event) {
                 var xoffset = 0,
@@ -315,19 +396,21 @@
                 box.attr("width", dx);
                 box.attr("height", dy);
             }
-
-
-
             function dragend(event) {
                 //get the bounds of the selections
                 var bounds = box.getBBox();
                 box.remove();
                 reset();
-                for (var c in objects.items) {
+                
+                for(var i = 0; i < objects.length; i++){
+                //for (var c in objects.items) {
                     //here, we want to get the x,y vales of each object regardless of what sort of shape it is, but rect uses rx and ry, circle uses cx and cy, etc
                     //so we'll see if the bounding boxes intercept instead
+                    
+                   /* if(objects[i].form)
+                        console.log(objects[i].form.type);*/
 
-                    var mybounds = objects[c].getBBox();
+                    var mybounds = objects[i].form.getBBox();
                     //do bounding boxes overlap?
                     //is one of this object's x extremes between the selection's xextremes?
 
@@ -335,15 +418,16 @@
                     if (mybounds.x >= bounds.x && mybounds.x <= bounds.x2 || mybounds.x2 >= bounds.x && mybounds.x2 <= bounds.x2) {
                         //same for y
                         if (mybounds.y >= bounds.y && mybounds.y <= bounds.y2 || mybounds.y2 >= bounds.y && mybounds.y2 <= bounds.y2) {
-                            currentAdd(objects[c]);
+                            currentAdd(objects[i]);
                         }
                     }
 
 
 
                 }
+                
+                console.log(currentObjects.length);
             }
-
             function reset() {
                 currentReset();
             }

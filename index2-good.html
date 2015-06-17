@@ -110,16 +110,21 @@
             var selects = paper.set();
             var image = paper.image("reserva-online-tenis-mapa.png", 0, 0, 700, 400);
             var panel = paper.rect(710, 10, 130, 100);
-            var p1 = paper.set(
-                    paper.circle(730, 30, 10).attr("fill", "#0000FF")
-                    );
+            
+            var p1 = {
+                form: paper.circle(730, 30, 10).attr("fill", "#0000FF"),
+                ox : 0,
+                oy : 0
+            };
             //var p2 = paper.path("m 750 21 c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 l 35,0 c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#0000FF");
 
 
-            var p2 = paper.set(
-                    paper.path("m 750 21 c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 l 35,0 c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#0000FF"),
-                    paper.text(760, 29, "Hi")
-                    );
+            var p2 = {
+                form: paper.path("m 750 21 c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 l 35,0 c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#0000FF"),
+                text: paper.text(760, 29, "Hi"),
+                ox : 0,
+                oy : 0
+            };
 
 
 
@@ -182,7 +187,6 @@
 
                 posRestart();
             };
-
             var DragMove = function (dx, dy) {
 
                 currentObjects.forEach(function (c) {
@@ -204,13 +208,15 @@
                 });
             };
             var DragUp = function () {
-                console.log(objects.items.length);
             };
 
 
             function copyObject(obj) {
 
-                copy = obj.clone();
+                copy = {
+                    form : obj.form,
+                    text : obj.text
+                };
                 copy.data("ox", 0);
                 copy.data("oy", 0);
 
@@ -260,7 +266,6 @@
             var move = function (dx, dy) {
 
                 currentObjects.forEach(function (c) {
-                    //console.log(c.data("ox"), dx);
                     c.attr({
                         transform: "...T" + (dx - c.data("ox")) + "," + (dy - c.data("oy"))
                     });
@@ -284,8 +289,69 @@
             var up = function () {
             };
 
-            paper.set(p1).drag(move, start, up);
-            paper.set(p2).drag(move, start, up);
+            //paper.set(p1).drag(move, start, up);
+            //paper.set(p2).drag(move, start, up);
+
+            var draggable = function (obj) {
+                var me = obj.form,
+                        lx = 0,
+                        ly = 0,
+                        ox = 0,
+                        oy = 0,
+                        moveFnc = function (dx, dy) {
+                            lx = dx + ox;
+                            ly = dy + oy;
+                            me.transform('t' + lx + ',' + ly);
+                            if (obj.text)
+                                obj.text.transform('t' + lx + ',' + ly);
+                        },
+                        startFnc = function () {
+                        },
+                        endFnc = function () {
+                            ox = lx;
+                            oy = ly;
+                        };
+                obj.form.drag(moveFnc, startFnc, endFnc);
+            };
+
+            var copyable = function (obj) {
+                        moveFnc = function (dx, dy) {
+                            currentObjects.forEach(function (c) {
+                                c.form.attr({
+                                    transform: "...T" + (dx - c.data("ox")) + "," + (dy - c.data("oy"))
+                                });
+
+                                c.text.attr({
+                                    transform: "...T" + (dx - c.data("ox")) + "," + (dy - c.data("oy"))
+                                });
+
+                                c.data("ox", dx);
+                                c.data("oy", dy);
+                            });
+                            /*lx = dx + ox;
+                             ly = dy + oy;
+                             me.transform('t' + lx + ',' + ly);
+                             if (obj.text)
+                             obj.text.transform('t' + lx + ',' + ly);*/
+                        },
+                        startFnc = function () {
+                            copyObject(obj);
+
+                            currentReset();
+                            changeColor(copy.form.attr("fill"));
+                            obj.ox = 0;
+                            obj.oy = 0;
+
+                            currentAdd(copy);
+                            posRestart();
+                        },
+                        endFnc = function () {
+                        };
+                obj.form.drag(moveFnc, startFnc, endFnc);
+            };
+
+            copyable(p2);
+            draggable(p1);
 
 
 
