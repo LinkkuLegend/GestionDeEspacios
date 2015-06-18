@@ -138,6 +138,20 @@
                 pos = 10;
             }
 
+            function exclude(a, array) {
+                var c;
+                for (var b = 0, c = array.length; c > b;b++)
+                    if (array[b] === a)
+                        return array.splice(b, 1);
+            };
+            
+            function remove(obj){
+                obj.form.remove();
+                if(obj.text)
+                    obj.text.remove();
+                delete obj;
+            }
+
             $(document).on('keydown', function (e) {
                 // You may replace `c` with whatever key you want
                 if (e.ctrlKey && (String.fromCharCode(e.which) === 'c' || String.fromCharCode(e.which) === 'C')) {
@@ -157,11 +171,23 @@
                     }
                 }
                 if (e.which === 46) {
-                    for (var c in currentObjects.items) {
+                    console.log("Objectos antes:", objects.length);
+                    for (var i = 0; i < currentObjects.length; i++) {
+                        exclude(currentObjects[i], objects);
+                        remove(currentObjects[i]);
+                        //currentObjects.splice(i,1);
+                    }
+                    console.log("Objectos después:", objects.length);
+                    currentReset();
+                    
+                    
+
+
+                    /*for (var c in currentObjects.items) {
                         objects.exclude(currentObjects[c]);
                         currentObjects[c].remove();
                     }
-                    currentReset();
+                    currentReset();*/
                 }
 
             });
@@ -240,12 +266,16 @@
 
             function currentReset() {
                 //clearState();
+                clear();
+                
                 currentObjects = [];
             }
 
             function currentAdd(obj) {
                 //changeColor(obj.form.attr("fill"));
                 //console.log(currentObjects.length);
+                obj.form.attr({'opacity': 0.8});
+                
                 currentObjects.push(obj);
                 //console.log(currentObjects.length);
                 /*var box = obj.form.getBBox();
@@ -323,7 +353,7 @@
                 };
 
                 var up = function () {
-                    console.log(objects.length);
+                    //console.log(objects.length);
                 };
 
                 obj.form.drag(move, start, up);
@@ -374,11 +404,15 @@
 
             var box;
             //set that will receive the selected items
-
+            function clear(){
+                for(var i = 0; i < objects.length; i++)
+                    objects[i].form.attr({'opacity': 1});
+            };
 
             //DRAG FUNCTIONS
             //when mouse goes down over background, start drawing selection box
             function dragstart(x, y, event) {
+                clear();
                 box = paper.rect(x - paper.canvas.parentNode.offsetLeft, y - paper.canvas.parentNode.offsetTop, 0, 0).attr("stroke", "#9999FF");
             }
             //when mouse moves during drag, adjust box. If to left or above original point, you have to translate the whole box and invert the dx or dy values since .rect() doesn't take negative width or height
