@@ -213,7 +213,7 @@
             var cloneObj = function (obj) {
                 var formCopy = obj.form.clone();
                 var copy = {};
-                
+
                 if (obj.text) {
                     var textCopy = obj.text.clone();
                     copy = {
@@ -221,12 +221,12 @@
                         text: textCopy,
                         ox: 0, oy: 0
                     };
-                }else
-                copy = {
-                    form: formCopy,
-                    ox: 0, oy: 0
-                };
-                
+                } else
+                    copy = {
+                        form: formCopy,
+                        ox: 0, oy: 0
+                    };
+
                 objects.push(copy);
                 return copy;
             };
@@ -302,7 +302,8 @@
                     for (var i = 0; i < currentObjects.length; i++) {
                         currentObjects[i].ox = 0;
                         currentObjects[i].oy = 0;
-                    };
+                    }
+                    ;
 
                 };
                 var move = function (dx, dy) {
@@ -378,7 +379,7 @@
             //DRAG FUNCTIONS
             //when mouse goes down over background, start drawing selection box
             function dragstart(x, y, event) {
-                box = paper.rect(x - 260, y - 100, 0, 0).attr("stroke", "#9999FF");
+                box = paper.rect(x - paper.canvas.parentNode.offsetLeft, y - paper.canvas.parentNode.offsetTop, 0, 0).attr("stroke", "#9999FF");
             }
             //when mouse moves during drag, adjust box. If to left or above original point, you have to translate the whole box and invert the dx or dy values since .rect() doesn't take negative width or height
             function dragmove(dx, dy, x, y, event) {
@@ -401,14 +402,14 @@
                 var bounds = box.getBBox();
                 box.remove();
                 reset();
-                
-                for(var i = 0; i < objects.length; i++){
-                //for (var c in objects.items) {
+
+                for (var i = 0; i < objects.length; i++) {
+                    //for (var c in objects.items) {
                     //here, we want to get the x,y vales of each object regardless of what sort of shape it is, but rect uses rx and ry, circle uses cx and cy, etc
                     //so we'll see if the bounding boxes intercept instead
-                    
-                   /* if(objects[i].form)
-                        console.log(objects[i].form.type);*/
+
+                    /* if(objects[i].form)
+                     console.log(objects[i].form.type);*/
 
                     var mybounds = objects[i].form.getBBox();
                     //do bounding boxes overlap?
@@ -425,8 +426,8 @@
 
 
                 }
-                
-                console.log(currentObjects.length);
+
+                //console.log(currentObjects.length);
             }
             function reset() {
                 currentReset();
