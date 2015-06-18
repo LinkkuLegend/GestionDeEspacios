@@ -131,7 +131,7 @@
              p2.attr('path', newPath);*/
 
 
-
+            var pos = 10;
 
             var currectCopy;
             function posRestart() {
@@ -140,34 +140,68 @@
 
             function exclude(a, array) {
                 var c;
-                for (var b = 0, c = array.length; c > b;b++)
+                for (var b = 0, c = array.length; c > b; b++)
                     if (array[b] === a)
                         return array.splice(b, 1);
-            };
-            
-            function remove(obj){
+            }
+
+
+            function remove(obj) {
                 obj.form.remove();
-                if(obj.text)
+                if (obj.text)
                     obj.text.remove();
                 delete obj;
             }
 
+            function deepCopy(array) {
+                var v = [];
+                for (var i = 0; i < array.length; i++)
+                    if (array[i].text)
+                        v.push({
+                            form: array[i].form.clone(),
+                            text: array[i].text.clone(),
+                            ox: array[i].ox,
+                            oy: array[i].oy
+                        });
+                    else
+                        v.push({
+                            form: array[i].form.clone(),
+                            ox: array[i].ox,
+                            oy: array[i].oy
+                        });
+                return v;
+            }
+
+
             $(document).on('keydown', function (e) {
                 // You may replace `c` with whatever key you want
                 if (e.ctrlKey && (String.fromCharCode(e.which) === 'c' || String.fromCharCode(e.which) === 'C')) {
+                    currectCopy = [];
                     currectCopy = currentObjects;
                     posRestart();
+                    console.log(currentObjects.length);
                 }
                 if (e.ctrlKey && (String.fromCharCode(e.which) === 'v' || String.fromCharCode(e.which) === 'V')) {
                     if (currectCopy) {
-                        copy = currectCopy.clone();
-                        copy.forEach(function (e) {
-                            objects.push(e);
-                        });
+                        var copy = deepCopy(currectCopy);
+                        /*copy.forEach(function (e) {
+                         objects.push(e);
+                         });*/
+                        translateArray2(pos, pos, copy);
+                        currentReset();
+                        console.log("Se va a copiar", copy.length, ":", copy);
+                        console.log("Antes había:", objects.length, "objectos.");
+                        for (var i = 0; i < copy.length; i++) {
+                            draggable(copy[i]);
+                            objects.push(copy[i]);
+                            currentAdd(copy[i]);
+                        }
 
-                        copy.translate(pos, pos);
+                        console.log("Ahora hay:", objects.length, "objectos.");
+
+                        //copy.translate(pos, pos);
                         pos = pos + 10;
-                        paper.set(copy).drag(DragMove, DragStart, DragUp);
+                        //paper.set(copy).drag(DragMove, DragStart, DragUp);
                     }
                 }
                 if (e.which === 46) {
@@ -179,15 +213,15 @@
                     }
                     console.log("Objectos después:", objects.length);
                     currentReset();
-                    
-                    
+
+
 
 
                     /*for (var c in currentObjects.items) {
-                        objects.exclude(currentObjects[c]);
-                        currentObjects[c].remove();
-                    }
-                    currentReset();*/
+                     objects.exclude(currentObjects[c]);
+                     currentObjects[c].remove();
+                     }
+                     currentReset();*/
                 }
 
             });
@@ -267,7 +301,7 @@
             function currentReset() {
                 //clearState();
                 clear();
-                
+
                 currentObjects = [];
             }
 
@@ -275,7 +309,7 @@
                 //changeColor(obj.form.attr("fill"));
                 //console.log(currentObjects.length);
                 obj.form.attr({'opacity': 0.8});
-                
+
                 currentObjects.push(obj);
                 //console.log(currentObjects.length);
                 /*var box = obj.form.getBBox();
@@ -323,33 +357,64 @@
             var up = function () {
             };
 
+            var translateArray2 = function (dx, dy, array) {
+                for (var i = 0; i < array.length; i++) {
+                    array[i].form.attr({
+                        transform: "...T" + dx + "," + dy
+                    });
+
+                    if (array[i].text)
+                        array[i].text.attr({
+                            transform: "...T" + dx + "," + dy
+                        });
+
+                    array[i].ox = dx;
+                    array[i].oy = dy;
+                }
+            };
+
+            var translateArray = function (dx, dy, array) {
+                for (var i = 0; i < array.length; i++) {
+                    array[i].form.attr({
+                        transform: "...T" + (dx - array[i].ox) + "," + (dy - array[i].oy)
+                    });
+
+                    if (array[i].text)
+                        array[i].text.attr({
+                            transform: "...T" + (dx - array[i].ox) + "," + (dy - array[i].oy)
+                        });
+
+                    array[i].ox = dx;
+                    array[i].oy = dy;
+                }
+            };
+
+            function objectInArray(a, array) {
+                var c;
+                for (var b = 0, c = array.length; c > b; b++)
+                    if (array[b] === a)
+                        return true;
+                return false;
+            }
+
             var draggable = function (obj) {
                 var start = function () {
-                    if (currentObjects.length < 2)
-                        currentReset();
-                    currentAdd(obj);
+                    //if (currentObjects.length < 2 && !objectInArray(obj, currentObjects))
 
+                    if (!objectInArray(obj, currentObjects)) {
+                        currentReset();
+                        currentAdd(obj);
+                    }
+                    
                     for (var i = 0; i < currentObjects.length; i++) {
                         currentObjects[i].ox = 0;
                         currentObjects[i].oy = 0;
                     }
-                    ;
+
 
                 };
                 var move = function (dx, dy) {
-                    for (var i = 0; i < currentObjects.length; i++) {
-                        currentObjects[i].form.attr({
-                            transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
-                        });
-
-                        if (currentObjects[i].text)
-                            currentObjects[i].text.attr({
-                                transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
-                            });
-
-                        currentObjects[i].ox = dx;
-                        currentObjects[i].oy = dy;
-                    }
+                    translateArray(dx, dy, currentObjects);
                 };
 
                 var up = function () {
@@ -373,19 +438,20 @@
                     currentAdd(copy);
                 };
                 var move = function (dx, dy) {
-                    for (var i = 0; i < currentObjects.length; i++) {
-                        currentObjects[i].form.attr({
-                            transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
-                        });
-
-                        if (currentObjects[i].text)
-                            currentObjects[i].text.attr({
-                                transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
-                            });
-
-                        currentObjects[i].ox = dx;
-                        currentObjects[i].oy = dy;
-                    }
+                    translateArray(dx, dy, currentObjects);
+                    /*for (var i = 0; i < currentObjects.length; i++) {
+                     currentObjects[i].form.attr({
+                     transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
+                     });
+                     
+                     if (currentObjects[i].text)
+                     currentObjects[i].text.attr({
+                     transform: "...T" + (dx - currentObjects[i].ox) + "," + (dy - currentObjects[i].oy)
+                     });
+                     
+                     currentObjects[i].ox = dx;
+                     currentObjects[i].oy = dy;
+                     }*/
                 };
 
                 var up = function () {
@@ -404,10 +470,11 @@
 
             var box;
             //set that will receive the selected items
-            function clear(){
-                for(var i = 0; i < objects.length; i++)
+            function clear() {
+                for (var i = 0; i < objects.length; i++)
                     objects[i].form.attr({'opacity': 1});
-            };
+            }
+
 
             //DRAG FUNCTIONS
             //when mouse goes down over background, start drawing selection box
