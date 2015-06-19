@@ -147,6 +147,7 @@
             var paper = Raphael("canvas1", "100%", "100%");
 
             var objects = [];
+            var unDo = [];
             var selects = paper.set();
             var image = paper.image("reserva-online-tenis-mapa.png", 0, 0, 700, 400);
             var panel = paper.rect(710, 10, 130, 100);
@@ -159,6 +160,7 @@
                     c 0,0 9,0.082 9,9 0,8.9179 -9,9 -9,9 \n\
                     z").attr({"fill": "#00ee99", 'cursor': 'pointer'}),
                 text: paper.text(726, 29, "Hi").attr({'text-anchor': 'start', 'cursor': 'pointer'}),
+                check: paper.rect(745, 21, 15, 15).attr({'stroke': 0, 'fill': '#00ee99'}).hide(),
                 ox: 0,
                 oy: 0,
                 formLength: 2,
@@ -176,36 +178,30 @@
                     this.formLength < 8 ? this.formLength = 8 : null;
                     //console.log(this.formLength);
                     //console.log()
+
+
                     this.form.attr('path', "\
                      m 730 38  \n\
                      c 0,0 -9,0.1018 -9,-9 0,-9.1018 9,-9 9,-9 \n\
                      l " + (this.formLength - 8) + ",0 \n\
                      c 0,0 9,0.082 9,9 0,8.9179 -9,9 -9,9 \n\
                      z");
+                    //this.check.transform("");
+                    var distance = -this.check.getBBox().x + this.form.getBBox().x2 + 5;
+                    if (distance !== 0)
+                        this.check.transform("...T" + distance + ", 0");
+                    console.log("...T" + (this.form.getBBox().width + 5) + ", 0");
                 }
             };
-
-            /*p1.prototype.changeForm = function () {
-             console.log("Al menos he entrado");
-             this.formLength = this.text.attr('text').getBBox().width;
-             this.form.attr('path', "\
-             m 730 38  \n\
-             c 0,0 -9,0.1018 -9,-9 0,-9.1018 9,-9 9,-9 \n\
-             l " + formLength + ",0 \n\
-             c 0,0 9,0.082 9,9 0,8.9179 -9,9 -9,9 \n\
-             z");
-             };*/
-
-            //var p2 = paper.path("m 750 21 c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 l 35,0 c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#0000FF");
-
 
             var p2 = {
                 form: paper.path("\
                     m 755 21 \n\
                     c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 \n\
-                    l 35,0 \n\
+                    l 12,0 \n\
                     c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#00ee99").attr({'cursor': 'pointer'}),
                 text: paper.text(755, 29, "Hi").attr({'text-anchor': 'start', 'cursor': 'pointer'}),
+                check: paper.rect(775, 21, 15, 15).attr({'stroke': 0, 'fill': '#00ee99'}).hide(),
                 ox: 0,
                 oy: 0,
                 formLength: 2,
@@ -217,20 +213,33 @@
                     if (this.text.attr('text') !== "")
                         this.formLength = this.text.getBBox().width;
                     else
-                        this.formLength = 0;
+                        this.formLength = 1;
 
                     //if(this.formLength < 0)
-                    this.formLength < 0 ? this.formLength = 8 : null;
+                    this.formLength < 1 ? this.formLength = 8 : null;
                     //console.log(this.formLength);
                     //console.log()
                     this.form.attr('path', "\
                     m 755 21 \n\
                     c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 \n\
-                    l " + (this.formLength - 0) + ",0 \n\
+                    l " + (this.formLength + 1) + ",0 \n\
                     c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z");
+                    var distance = -this.check.getBBox().x + this.form.getBBox().x2 + 5;
+                    if (distance !== 0)
+                        this.check.transform("...T" + distance + ", 0");
                 }
             };
 
+            /*var unDoCount = -1;
+             
+             function addUnDoAction() {
+             unDo.push(deepCopy(objects));
+             if (unDo.length > 10) {
+             unDo.splice(0, 1);
+             } else {
+             unDoCount++;
+             }
+             }*/
 
 
             /*var newPath = Raphael.transformPath(p2.attr('path'), 't30,0');
@@ -254,8 +263,8 @@
 
             function remove(obj) {
                 obj.form.remove();
-                if (obj.text)
-                    obj.text.remove();
+                obj.text.remove();
+                obj.check.remove();
                 delete obj;
             }
 
@@ -265,6 +274,7 @@
                     v.push({
                         form: array[i].form.clone(),
                         text: array[i].text.clone(),
+                        check: array[i].check.clone(),
                         ox: array[i].ox,
                         oy: array[i].oy,
                         formLength: array[i].formLength,
@@ -275,13 +285,14 @@
             }
 
 
+
             $(document).on('keydown', function (e) {
                 // You may replace `c` with whatever key you want
                 if (e.ctrlKey && (String.fromCharCode(e.which) === 'c' || String.fromCharCode(e.which) === 'C')) {
                     currectCopy = [];
                     currectCopy = currentObjects;
                     posRestart();
-                    console.log(currentObjects.length);
+                    console.log("Objetos seleccionados para copiar:", currentObjects.length);
                 }
                 if (e.ctrlKey && (String.fromCharCode(e.which) === 'v' || String.fromCharCode(e.which) === 'V')) {
                     if (currectCopy) {
@@ -305,6 +316,11 @@
                         //paper.set(copy).drag(DragMove, DragStart, DragUp);
                     }
                 }
+                /*if (e.ctrlKey && (String.fromCharCode(e.which) === 'z' || String.fromCharCode(e.which) === 'Z')) {
+                 if(unDoCount > -1)
+                 objects = unDo[unDoCount];
+                 currentReset();
+                 }*/
                 if (e.which === 46) {
                     console.log("Objectos antes:", objects.length);
                     for (var i = 0; i < currentObjects.length; i++) {
@@ -325,10 +341,12 @@
             var cloneObj = function (obj) {
                 var formCopy = obj.form.clone();
                 var textCopy = obj.text.clone();
+                var checkCopy = obj.check.clone();
                 var copy = {};
                 copy = {
                     form: formCopy,
                     text: textCopy,
+                    check: checkCopy,
                     ox: 0, oy: 0,
                     formLength: obj.formLength,
                     changeForm: obj.changeForm
@@ -349,7 +367,7 @@
             function currentAdd(obj) {
                 //changeColor(obj.form.attr("fill"));
                 //console.log(currentObjects.length);
-                obj.form.attr({'opacity': 0.8});
+                obj.form.attr({'opacity': 0.5});
                 currentObjects.push(obj);
                 changeText(currentObjects);
                 //console.log(currentObjects.length);
@@ -370,6 +388,10 @@
                     array[i].text.attr({
                         transform: "...T" + dx + "," + dy
                     });
+
+                    array[i].check.attr({
+                        transform: "...T" + dx + "," + dy
+                    });
                     array[i].ox = dx;
                     array[i].oy = dy;
                 }
@@ -381,6 +403,10 @@
                     });
                     //if (array[i].text)
                     array[i].text.attr({
+                        transform: "...T" + (dx - array[i].ox) + "," + (dy - array[i].oy)
+                    });
+
+                    array[i].check.attr({
                         transform: "...T" + (dx - array[i].ox) + "," + (dy - array[i].oy)
                     });
                     array[i].ox = dx;
@@ -417,6 +443,7 @@
                     translateArray(dx, dy, currentObjects);
                 };
                 var up = function () {
+                    //addUnDoAction();
                     //console.log(objects.length);
                 };
                 obj.form.drag(move, start, up);
@@ -427,11 +454,13 @@
                 //var copy = cloneObj(obj);
                 var start = function () {
                     var copy = cloneObj(obj);
+                    copy.check.show();
                     draggable(copy);
                     //copy = cloneObj(obj);
                     currentReset();
                     copy.ox = 0;
                     copy.oy = 0;
+
                     //console.log(copy.form);
 
                     /*copy.form.attr({"cursor":"pointer"});
