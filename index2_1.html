@@ -64,6 +64,12 @@
                 -webkit-box-shadow: rgba(0,0,0,0.5) 5px 5px 20px;
                 -moz-box-shadow: rgba(0,0,0,0.5) 5px 5px 20px;
                 box-shadow: rgba(0,0,0,0.5) 5px 5px 20px;
+                cursor: default;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
             }
 
             text {
@@ -89,8 +95,9 @@
 
                 <div id='glasspane'>
                     <div style="color:#000000">Texto: </div>
-                    <input type="text" name="firstname" id="color" size = "10">
-                    <button onclick="myFunction()">Cambiar</button>
+                    <input type="text" name="firstname" id="color" size = "10" onkeydown="if (event.keyCode == 13)
+                                document.getElementById('buttonText').click()">
+                    <button id='buttonText' onclick="myFunction()">Cambiar</button>
 
                 </div>
             </div>
@@ -425,7 +432,7 @@
                     currentReset();
                     copy.ox = 0;
                     copy.oy = 0;
-                    console.log(copy.form);
+                    //console.log(copy.form);
 
                     /*copy.form.attr({"cursor":"pointer"});
                      copy.text.attr({"cursor":"pointer"});*/
