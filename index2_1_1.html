@@ -98,7 +98,6 @@
                     <input type="text" name="firstname" id="color" size = "10" onkeydown="if (event.keyCode == 13)
                                 document.getElementById('buttonText').click()">
                     <button id='buttonText' onclick="myFunction()">Cambiar</button>
-                    <button id='buttonSave' onclick="myFunction2()">Guardar</button>
 
                 </div>
             </div>
@@ -125,12 +124,11 @@
                     //if (currentObjects[i].text.attr("text") !== "")
                     currentObjects[i].changeForm();
                     //else
+
                     /*objects.exclude(currentObjects[c]);
                      currentObjects[c].remove();*/
                 }
             }
-
-
 
             /*function changeFormLength(obj) {
              var w = obj.text.attr('text').getBBox().width;
@@ -231,93 +229,6 @@
                         this.check.transform("...T" + distance + ", 0");
                 }
             };
-
-            var glowable = function (obj) {
-                obj.form.hover(
-                        function () {
-                            obj.form.attr({'opacity': 0.8});
-                            obj.g = obj.form.glow({
-                                color: "#F00",
-                                width: 10
-                            });
-                        },
-                        function () {
-                            obj.form.attr({'opacity': 1});
-                            obj.g.remove();
-                        });
-                obj.text.hover(
-                        function () {
-                            obj.form.attr({'opacity': 0.8});
-                            obj.g = obj.form.glow({
-                                color: "#F00",
-                                width: 10
-                            });
-                        },
-                        function () {
-                            obj.form.attr({'opacity': 1});
-                            obj.g.remove();
-                        });
-            };
-
-
-            function myFunction2() {
-
-                var data = [];
-                var actual;
-
-                /*var getPath = function(path){
-                 
-                 Raphael.transformPath(this.attr('path'), transform);
-                 
-                 };*/
-
-                for (var i = 0; i < objects.length; i++) {
-                    var boxForm = objects[i].form.getBBox();
-                    var boxText = objects[i].text.getBBox();
-                    actual = {
-                        formPath: Raphael.transformPath(objects[i].form.attr('path'), objects[i].form.attr('transform')),
-                        formX: boxForm.x,
-                        formY: boxForm.y,
-                        formColor: objects[i].form.attr('fill'),
-                        formCursor: 'pointer',
-                        textPath: objects[i].text.attr('text'),
-                        textX: boxText.x + boxText.width / 2,
-                        textY: boxText.y + boxText.height / 2,
-                        textCursor: 'pointer'
-                    };
-                    data.push(actual);
-                    //paper.rect(boxText.x, boxText.y, boxText.width, boxText.height);
-                    //paper.text(actual.textX, actual.textY, actual.textPath);
-                }
-
-                console.log(data);
-
-
-                console.log("Objectos antes:", objects.length);
-                for (var i = 0; i < objects.length; i++) {
-                    //exclude(currentObjects[i], objects);
-                    remove(objects[i]);
-                    //currentObjects.splice(i,1);
-                }
-                objects = [];
-                console.log("Objectos después:", objects.length);
-                currentReset();
-
-                var newObjects = [];
-
-                var element;
-                for (var i = 0; i < data.length; i++) {
-                    element = {
-                        form: paper.path(data[i].formPath).attr({'fill': data[i].formColor, 'cursor': data[i].formCursor}),
-                        text: paper.text(data[i].textX, data[i].textY, data[i].textPath).attr({'cursor': data[i].textCursor})
-                    };
-                    glowable(element);
-                    newObjects.push(element);
-                }
-
-                //$('<a href="data:' + data + '" download="data.json">download JSON</a>').appendTo('glasspane');
-                //document.getElementById('buttonSave').href = makeTextFile(getElementById('buttonSave').value);
-            }
 
             /*var unDoCount = -1;
              
@@ -636,14 +547,13 @@
                     //do bounding boxes overlap?
                     //is one of this object's x extremes between the selection's xextremes?
 
-                    if(Raphael.isBBoxIntersect(bounds, mybounds))
-                         currentAdd(objects[i]);
-                    /*if (mybounds.x >= bounds.x && mybounds.x <= bounds.x2 || mybounds.x2 >= bounds.x && mybounds.x2 <= bounds.x2) {
+
+                    if (mybounds.x >= bounds.x && mybounds.x <= bounds.x2 || mybounds.x2 >= bounds.x && mybounds.x2 <= bounds.x2) {
                         //same for y
                         if (mybounds.y >= bounds.y && mybounds.y <= bounds.y2 || mybounds.y2 >= bounds.y && mybounds.y2 <= bounds.y2) {
                             currentAdd(objects[i]);
                         }
-                    }*/
+                    }
 
 
 

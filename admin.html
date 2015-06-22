@@ -636,14 +636,13 @@
                     //do bounding boxes overlap?
                     //is one of this object's x extremes between the selection's xextremes?
 
-                    if(Raphael.isBBoxIntersect(bounds, mybounds))
-                         currentAdd(objects[i]);
-                    /*if (mybounds.x >= bounds.x && mybounds.x <= bounds.x2 || mybounds.x2 >= bounds.x && mybounds.x2 <= bounds.x2) {
+
+                    if (mybounds.x >= bounds.x && mybounds.x <= bounds.x2 || mybounds.x2 >= bounds.x && mybounds.x2 <= bounds.x2) {
                         //same for y
                         if (mybounds.y >= bounds.y && mybounds.y <= bounds.y2 || mybounds.y2 >= bounds.y && mybounds.y2 <= bounds.y2) {
                             currentAdd(objects[i]);
                         }
-                    }*/
+                    }
 
 
 
