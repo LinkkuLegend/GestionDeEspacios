@@ -112,6 +112,7 @@
                                 document.getElementById('buttonText').click()">
                     <button id='buttonText' onclick="myFunction()">Cambiar</button>
                     <button id='buttonSave' onclick="myFunction2()">Guardar</button>
+                    <!--<button id='buttonSave' onclick="myFunction3()">Resize</button>-->
                 </div>
             </div>
         </div>
@@ -119,6 +120,10 @@
 
 
         <script>
+
+            var objectsArray = [];
+            var id = 0;
+            var currentId = -1;
 
             $(document).ready(function () {
                 $('.fileUpload').liteUploader({
@@ -154,7 +159,12 @@
                                 //if (i === 0)
                                 //changeImage(url);
 
-                                $('#panelHolder').append('<div id="imgHolder"><img onclick="changeImage(this)" src="' + url + '" /></div>');
+                                objectsArray.push({
+                                    id: id,
+                                    objects: []
+                                });
+                                $('#panelHolder').append('<div id="imgHolder"><img onclick="changeImage(this,' + id + ')" src="' + url + '" /></div>');
+                                id++;
                             });
                             //$('#previews').append('</div>');
                             //$('#display').append(response.message);
@@ -175,71 +185,106 @@
                 return t.height;
             }
 
-            function changeImage(element) {
+            function toResize(array) {
+                console.log("Dentro: " + array.length);
+                for (var i = 0; i < array.length; i++) {
+                    array[i].form.transform("s2");
+                    array[i].text.transform("s2");
+                    array[i].check.transform("s2");
+
+
+                }
+            }
+
+            function myFunction3() {
+                console.log("Fuera: " + currentObjects.length);
+                toResize(currentObjects);
+
+            }
+
+
+            function toFront(array) {
+                for (var i = 0; i < array.length; i++) {
+                    array[i].form.toFront();
+                    array[i].text.toFront();
+                    array[i].check.toFront();
+                }
+            }
+
+            function toHide(array) {
+                for (var i = 0; i < array.length; i++) {
+                    array[i].form.hide();
+                    array[i].text.hide();
+                    array[i].check.hide();
+                }
+            }
+
+            function toShow(array) {
+                for (var i = 0; i < array.length; i++) {
+                    array[i].form.show();
+                    array[i].text.show();
+                    array[i].check.show();
+                }
+            }
+
+            function hideExceptId(id) {
+                for (var i = 0; i < objectsArray.length; i++) {
+                    if (objectsArray[i].id !== id) {
+                        toHide(objectsArray[i].objects);
+                    }
+                }
+            }
+
+
+
+            function changeImage(element, id) {
+                if (currentId === id)
+                    return false;
                 if (image)
                     image.remove();
 
-                /*if (element.src) {
-                 //image = paper.image(element.src, 0, 0, 700, 500);
-                 console.log("El tamaño real de esta imagen es: " + getOriginalWidthOfImg(element) + "x" + getOriginalHeightOfImg(element));
-                 
-                 //$('main').attr({'width': '1050px'});
-                 //$('canvas1').attr({'width': '850px', 'height': '500px'});
-                 //paper.setSize(getOriginalWidthOfImg(element), getOriginalHeightOfImg(element));
-                 var width = getOriginalWidthOfImg(element);
-                 var height = getOriginalHeightOfImg(element);
-                 
-                 if (width > 700 && height > 500) {
-                 var wPercent, hPercent;
-                 wPercent = 1 - (700 / width);
-                 hPercent = 1 - (500 / height);
-                 
-                 if (wPercent > hPercent) {
-                 width = width - (width * wPercent);
-                 height = height - (height * wPercent);
-                 } else {
-                 width = width - (width * hPercent);
-                 height = height - (height * hPercent);
-                 }
-                 }
-                 
-                 console.log("El tamaño final de esta imagen es: " + width + "x" + height);
-                 image = paper.image(element.src, 0, 0, width, height);
-                 
-                 }*/
 
-                if (element.src) {
-                    var width = getOriginalWidthOfImg(element);
-                    var height = getOriginalHeightOfImg(element);
+                //if (element.src) {
+                var width = getOriginalWidthOfImg(element);
+                var height = getOriginalHeightOfImg(element);
 
-                    canvas.style.width = width + 150;
-                    canvas.style.height = height;
-                    paper.setSize(width + 150, height);
-                    c = {
-                        width: canvas.offsetWidth,
-                        height: canvas.offsetHeight,
-                        center: {x: canvas.offsetWidth / 2, y: canvas.offsetHeight / 2}
-                    };
-                    console.log(c);
-                    drawDragPanel();
+                canvas.style.width = width + 150;
+                canvas.style.height = height;
+                paper.setSize(width + 150, height);
+                c = {
+                    width: canvas.offsetWidth,
+                    height: canvas.offsetHeight,
+                    center: {x: canvas.offsetWidth / 2, y: canvas.offsetHeight / 2}
+                };
+                console.log(c);
+                drawDragPanel();
 
-                    image = paper.image(element.src, 0, 0, width, height);
+                image = paper.image(element.src, 0, 0, width, height);
+                //}
 
+
+                for (var i = 0; i < objectsArray.length; i++) {
+                    if (objectsArray[i].id === currentId) {
+                        objectsArray[i].objects = objects;
+                    }
                 }
 
-                /*canvas.style.width = 500;
-                 canvas.style.height = 400;
-                 c = {
-                 width: canvas.offsetWidth,
-                 height: canvas.offsetHeight,
-                 center: {x: canvas.offsetWidth / 2, y: canvas.offsetHeight / 2}
-                 };
-                 console.log(c);
-                 paper_bg.remove();
-                 paper_bg = paper.rect(0, 0, c.width, c.height);
-                 paper_bg.attr("stroke-width", 4).attr("stroke", "gray");*/
+                for (var i = 0; i < objectsArray.length; i++) {
+                    if (objectsArray[i].id === id) {
+                        objects = objectsArray[i].objects;
+                    }
+                }
 
+                toFront(objects);
+                toShow(objects);
+                hideExceptId(id);
 
+                currentReset();
+
+                console.log(objectsArray);
+                console.log(objects);
+
+                currentId = id;
 
 
                 image.drag(dragmove, dragstart, dragend);
@@ -310,6 +355,8 @@
             //var image = paper.image("reserva-online-tenis-mapa.png", 0, 0, 700, 400);
             var panel;
             var p1, p2;
+
+
             function drawDragPanel() {
                 if (panel)
                     panel.remove();
@@ -319,6 +366,12 @@
                     remove(p1);
                 p1 = draggable1();
                 copyable(p1);
+                if (p2)
+                    remove(p2);
+                p2 = draggable2();
+                copyable(p2);
+
+                //p1.form.transform("s4");
             }
 
 
@@ -348,16 +401,17 @@
                         if (this.text.attr('text') !== "")
                             this.formLength = this.text.getBBox().width;
                         else
-                            this.formLength = 8;
+                            this.formLength = 0;
 
                         //if(this.formLength < 0)
-                        this.formLength < 8 ? this.formLength = 8 : null;
+                        //this.formLength < 0 ? this.formLength = 0 : null;
                         //console.log(this.formLength);
                         //console.log()
+                        
+                        paper.rect(this.text.getBBox().x, this.text.getBBox().y, this.text.getBBox().width, this.text.getBBox().height);
 
 
-                        this.form.attr('path', "\
-                     m 730 38  \n\
+                        this.form.attr('path', "m " + (canvas.offsetWidth - 120) + " 38 \n\
                      c 0,0 -9,0.1018 -9,-9 0,-9.1018 9,-9 9,-9 \n\
                      l " + (this.formLength - 8) + ",0 \n\
                      c 0,0 9,0.082 9,9 0,8.9179 -9,9 -9,9 \n\
@@ -366,7 +420,7 @@
                         var distance = -this.check.getBBox().x + this.form.getBBox().x2 + 5;
                         if (distance !== 0)
                             this.check.transform("...T" + distance + ", 0");
-                        console.log("...T" + (this.form.getBBox().width + 5) + ", 0");
+                        //console.log("...T" + (this.form.getBBox().width + 5) + ", 0");
                     }
                 };
             }
@@ -375,13 +429,12 @@
 
             function draggable2() {
                 return {
-                    form: paper.path("\
-                    m 755 21 \n\
+                    form: paper.path("m " + (canvas.offsetWidth - 95) + " 20 \n\
                     c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 \n\
                     l 12,0 \n\
                     c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#00ee99").attr({'cursor': 'pointer'}),
-                    text: paper.text(755, 29, "Hi").attr({'text-anchor': 'start', 'cursor': 'pointer'}),
-                    check: paper.rect(775, 21, 15, 15).attr({'stroke': 0, 'fill': '#00ee99'}).hide(),
+                    text: paper.text((canvas.offsetWidth - 95), 29, "Hi").attr({'text-anchor': 'start', 'cursor': 'pointer'}),
+                    check: paper.rect((canvas.offsetWidth - 75), 21, 15, 15).attr({'stroke': 0, 'fill': '#00ee99'}).hide(),
                     ox: 0,
                     oy: 0,
                     formLength: 2,
@@ -399,8 +452,7 @@
                         this.formLength < 1 ? this.formLength = 8 : null;
                         //console.log(this.formLength);
                         //console.log()
-                        this.form.attr('path', "\
-                    m 755 21 \n\
+                        this.form.attr('path', "m " + (canvas.offsetWidth - 95) + " 20 \n\
                     c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 \n\
                     l " + (this.formLength + 1) + ",0 \n\
                     c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z");
