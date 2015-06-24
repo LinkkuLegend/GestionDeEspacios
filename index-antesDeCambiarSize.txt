@@ -8,9 +8,9 @@
 
         <style>
             * { font-family:arial }
-            #main { margin:10px auto;width: "100%"}
-            //.canvas { width:850px; left:120px;height:500px;position: relative;}
-            .canvas {width:850px; left:120px;height:500px;border:3px solid grey; position: relative; border-radius:6px; top:50%;}
+            #main { margin:10px auto;width: 1050px}
+            .canvas { width:850px; left:120px;height:500px;border:2px solid grey; position: relative; border-radius:6px;}
+            //.canvas {left:120px;border:2px solid grey; position: relative; border-radius:6px;}
 
             body {
                 background: #dddddd;
@@ -180,67 +180,36 @@
                     image.remove();
 
                 /*if (element.src) {
-                 //image = paper.image(element.src, 0, 0, 700, 500);
-                 console.log("El tamaño real de esta imagen es: " + getOriginalWidthOfImg(element) + "x" + getOriginalHeightOfImg(element));
-                 
-                 //$('main').attr({'width': '1050px'});
-                 //$('canvas1').attr({'width': '850px', 'height': '500px'});
-                 //paper.setSize(getOriginalWidthOfImg(element), getOriginalHeightOfImg(element));
-                 var width = getOriginalWidthOfImg(element);
-                 var height = getOriginalHeightOfImg(element);
-                 
-                 if (width > 700 && height > 500) {
-                 var wPercent, hPercent;
-                 wPercent = 1 - (700 / width);
-                 hPercent = 1 - (500 / height);
-                 
-                 if (wPercent > hPercent) {
-                 width = width - (width * wPercent);
-                 height = height - (height * wPercent);
-                 } else {
-                 width = width - (width * hPercent);
-                 height = height - (height * hPercent);
-                 }
-                 }
-                 
-                 console.log("El tamaño final de esta imagen es: " + width + "x" + height);
-                 image = paper.image(element.src, 0, 0, width, height);
-                 
-                 }*/
+                    //image = paper.image(element.src, 0, 0, 700, 500);
+                    console.log("El tamaño real de esta imagen es: " + getOriginalWidthOfImg(element) + "x" + getOriginalHeightOfImg(element));
 
-                if (element.src) {
+                    //$('main').attr({'width': '1050px'});
+                    //$('canvas1').attr({'width': '850px', 'height': '500px'});
+                    //paper.setSize(getOriginalWidthOfImg(element), getOriginalHeightOfImg(element));
                     var width = getOriginalWidthOfImg(element);
                     var height = getOriginalHeightOfImg(element);
 
-                    canvas.style.width = width + 150;
-                    canvas.style.height = height;
-                    paper.setSize(width + 150, height);
-                    c = {
-                        width: canvas.offsetWidth,
-                        height: canvas.offsetHeight,
-                        center: {x: canvas.offsetWidth / 2, y: canvas.offsetHeight / 2}
-                    };
-                    console.log(c);
-                    drawDragPanel();
+                    if (width > 700 && height > 500) {
+                        var wPercent, hPercent;
+                        wPercent = 1 - (700 / width);
+                        hPercent = 1 - (500 / height);
 
+                        if (wPercent > hPercent) {
+                            width = width - (width * wPercent);
+                            height = height - (height * wPercent);
+                        } else {
+                            width = width - (width * hPercent);
+                            height = height - (height * hPercent);
+                        }
+                    }
+
+                    console.log("El tamaño final de esta imagen es: " + width + "x" + height);
                     image = paper.image(element.src, 0, 0, width, height);
 
-                }
-
-                /*canvas.style.width = 500;
-                 canvas.style.height = 400;
-                 c = {
-                 width: canvas.offsetWidth,
-                 height: canvas.offsetHeight,
-                 center: {x: canvas.offsetWidth / 2, y: canvas.offsetHeight / 2}
-                 };
-                 console.log(c);
-                 paper_bg.remove();
-                 paper_bg = paper.rect(0, 0, c.width, c.height);
-                 paper_bg.attr("stroke-width", 4).attr("stroke", "gray");*/
-
-
-
+                }*/
+        
+        
+                
 
                 image.drag(dragmove, dragstart, dragend);
             }
@@ -285,131 +254,92 @@
              */
 
             // Creates canvas
-            //var paper = Raphael("canvas1", "100%", "100%");
-
-
-            var canvas = document.getElementById("canvas1");
-            var c = {
-                width: canvas.offsetWidth,
-                height: canvas.offsetHeight,
-                center: {x: canvas.offsetWidth / 2, y: canvas.offsetHeight / 2}
-            };
-            //console.log(c);
-
-// Creates Raphael canvas on canvas element
-            var paper = Raphael(canvas, c.width, c.height);
-
-
-
-
-
+            var paper = Raphael("canvas1", "100%", "100%");
 
             var objects = [];
             var unDo = [];
             var selects = paper.set();
             //var image = paper.image("reserva-online-tenis-mapa.png", 0, 0, 700, 400);
-            var panel;
-            var p1, p2;
-            function drawDragPanel() {
-                if (panel)
-                    panel.remove();
-                panel = paper.rect(canvas.offsetWidth - 146, 10, 130, 100);
-                console.log(canvas.offsetWidth + " " + canvas.offsetHeight);
-                if (p1)
-                    remove(p1);
-                p1 = draggable1();
-                copyable(p1);
-            }
-
-
-
-
-            function draggable1() {
-                return {
-                    //form: paper.circle(730, 30, 10).attr("fill", "#00ee99"),
-                    form: paper.path("m " + (canvas.offsetWidth - 120) + " 38 \n\
+            var panel = paper.rect(710, 10, 130, 100);
+            var p1 = {
+                //form: paper.circle(730, 30, 10).attr("fill", "#00ee99"),
+                form: paper.path("\
+                    m 730 38  \n\
                     c 0,0 -9,0.1018 -9,-9 0,-9.1018 9,-9 9,-9 \n\
                     l 1.453125,0 \n\
                     c 0,0 9,0.082 9,9 0,8.9179 -9,9 -9,9 \n\
                     z").attr({"fill": "#00ee99", 'cursor': 'pointer'}),
-                    text: paper.text(canvas.offsetWidth - 124, 29, "Hi").attr({'text-anchor': 'start', 'cursor': 'pointer'}),
-                    check: paper.rect(canvas.offsetWidth - 105, 21, 15, 15).attr({'stroke': 0, 'fill': '#00ee99'}).hide(),
-                    //730
-                    //text: paper.text(726, 29, "Hi").attr({'text-anchor': 'start', 'cursor': 'pointer'}),
-                    //check: paper.rect(745, 21, 15, 15).attr({'stroke': 0, 'fill': '#00ee99'}).hide(),
-                    ox: 0,
-                    oy: 0,
-                    formLength: 2,
-                    changeForm: function () {
+                text: paper.text(726, 29, "Hi").attr({'text-anchor': 'start', 'cursor': 'pointer'}),
+                check: paper.rect(745, 21, 15, 15).attr({'stroke': 0, 'fill': '#00ee99'}).hide(),
+                ox: 0,
+                oy: 0,
+                formLength: 2,
+                changeForm: function () {
 
-                        /*var hi = this.text.getBBox();*/
-                        //console.log(this.text.getBBox().width);
+                    /*var hi = this.text.getBBox();*/
+                    //console.log(this.text.getBBox().width);
 
-                        if (this.text.attr('text') !== "")
-                            this.formLength = this.text.getBBox().width;
-                        else
-                            this.formLength = 8;
+                    if (this.text.attr('text') !== "")
+                        this.formLength = this.text.getBBox().width;
+                    else
+                        this.formLength = 8;
 
-                        //if(this.formLength < 0)
-                        this.formLength < 8 ? this.formLength = 8 : null;
-                        //console.log(this.formLength);
-                        //console.log()
+                    //if(this.formLength < 0)
+                    this.formLength < 8 ? this.formLength = 8 : null;
+                    //console.log(this.formLength);
+                    //console.log()
 
 
-                        this.form.attr('path', "\
+                    this.form.attr('path', "\
                      m 730 38  \n\
                      c 0,0 -9,0.1018 -9,-9 0,-9.1018 9,-9 9,-9 \n\
                      l " + (this.formLength - 8) + ",0 \n\
                      c 0,0 9,0.082 9,9 0,8.9179 -9,9 -9,9 \n\
                      z");
-                        //this.check.transform("");
-                        var distance = -this.check.getBBox().x + this.form.getBBox().x2 + 5;
-                        if (distance !== 0)
-                            this.check.transform("...T" + distance + ", 0");
-                        console.log("...T" + (this.form.getBBox().width + 5) + ", 0");
-                    }
-                };
-            }
+                    //this.check.transform("");
+                    var distance = -this.check.getBBox().x + this.form.getBBox().x2 + 5;
+                    if (distance !== 0)
+                        this.check.transform("...T" + distance + ", 0");
+                    console.log("...T" + (this.form.getBBox().width + 5) + ", 0");
+                }
+            };
 
 
-
-            function draggable2() {
-                return {
-                    form: paper.path("\
+            var p2 = {
+                form: paper.path("\
                     m 755 21 \n\
                     c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 \n\
                     l 12,0 \n\
                     c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z").attr("fill", "#00ee99").attr({'cursor': 'pointer'}),
-                    text: paper.text(755, 29, "Hi").attr({'text-anchor': 'start', 'cursor': 'pointer'}),
-                    check: paper.rect(775, 21, 15, 15).attr({'stroke': 0, 'fill': '#00ee99'}).hide(),
-                    ox: 0,
-                    oy: 0,
-                    formLength: 2,
-                    changeForm: function () {
+                text: paper.text(755, 29, "Hi").attr({'text-anchor': 'start', 'cursor': 'pointer'}),
+                check: paper.rect(775, 21, 15, 15).attr({'stroke': 0, 'fill': '#00ee99'}).hide(),
+                ox: 0,
+                oy: 0,
+                formLength: 2,
+                changeForm: function () {
 
-                        /*var hi = this.text.getBBox();*/
-                        //console.log(this.text.getBBox().width);
+                    /*var hi = this.text.getBBox();*/
+                    //console.log(this.text.getBBox().width);
 
-                        if (this.text.attr('text') !== "")
-                            this.formLength = this.text.getBBox().width;
-                        else
-                            this.formLength = 1;
+                    if (this.text.attr('text') !== "")
+                        this.formLength = this.text.getBBox().width;
+                    else
+                        this.formLength = 1;
 
-                        //if(this.formLength < 0)
-                        this.formLength < 1 ? this.formLength = 8 : null;
-                        //console.log(this.formLength);
-                        //console.log()
-                        this.form.attr('path', "\
+                    //if(this.formLength < 0)
+                    this.formLength < 1 ? this.formLength = 8 : null;
+                    //console.log(this.formLength);
+                    //console.log()
+                    this.form.attr('path', "\
                     m 755 21 \n\
                     c 0,0 -4.32972223,4.1605 -4.37941422217,9 -0.0496919878,4.8384 4.37941422217,8.9923 4.37941422217,8.9923 \n\
                     l " + (this.formLength + 1) + ",0 \n\
                     c 0,0 4.363782,-4.3735 4.379414,-8.9923 0.01562,-4.6168 -4.379414,-9 -4.379414,-9 z");
-                        var distance = -this.check.getBBox().x + this.form.getBBox().x2 + 5;
-                        if (distance !== 0)
-                            this.check.transform("...T" + distance + ", 0");
-                    }
-                };
-            }
+                    var distance = -this.check.getBBox().x + this.form.getBBox().x2 + 5;
+                    if (distance !== 0)
+                        this.check.transform("...T" + distance + ", 0");
+                }
+            };
 
             var glowable = function (obj) {
                 obj.form.hover(
@@ -761,8 +691,8 @@
                 obj.form.drag(move, start, up);
                 obj.text.drag(move, start, up);
             };
-            /*copyable(p1);
-             copyable(p2);*/
+            copyable(p1);
+            copyable(p2);
             //paper.set(p1).drag(move, start, up);
             //paper.set(p2).drag(move, start, up);
 
