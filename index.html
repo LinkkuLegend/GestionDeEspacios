@@ -5,10 +5,12 @@
         <script src="raphael-2.1.2.js"></script>
         <script src="jquery-1.11.3.min.js"></script>
         <script src="jquery.liteuploader.js"></script>
+        <script src="raphael.free_transform.js"></script>
+        <script src="FileSaver.min.js"></script>
 
         <style>
             * { font-family:arial }
-            #main { margin:10px auto;width: "100%"}
+            #main { margin:10px auto;width: 100%}
             //.canvas { width:850px; left:120px;height:500px;position: relative;}
             .canvas {width:850px; left:120px;height:500px;border:3px solid grey; position: relative; border-radius:6px; top:50%;}
 
@@ -112,9 +114,9 @@
                                 document.getElementById('buttonText').click()">
                     <button id='buttonText' onclick="myFunction()">Cambiar</button>
                     <button id='buttonSave' onclick="myFunction2()">Guardar</button>
-                    <!--<button id='buttonSave' onclick="myFunction3()">Resize</button>-->
                 </div>
             </div>
+            <a href="cliente.html">Página cliente</a>
         </div>
 
 
@@ -153,17 +155,63 @@
                         .on('lu:success', function (e, response) {
                             var response = $.parseJSON(response);
                             $('#panelHolder').html('');
-
+                            urls = [];
                             //$('#panelHolder').append('<div id="panelHolder">');
                             $.each(response.urls, function (i, url) {
                                 //if (i === 0)
                                 //changeImage(url);
 
+
                                 objectsArray.push({
                                     id: id,
                                     objects: []
                                 });
-                                $('#panelHolder').append('<div id="imgHolder"><img onclick="changeImage(this,' + id + ')" src="' + url + '" /></div>');
+                                /*var curImg = new Image();
+                                 curImg.src = url;
+                                 curImg.onClick = function (){
+                                 changeImage(this,id);
+                                 };
+                                 
+                                 console.log(curImg.naturalWidth);*/
+
+                                //var curImg = $('<img onclick="changeImage(this,' + id + ')" src="' + url + '" />');
+                                var curDiv = $('<div id="imgHolder"><img onclick="changeImage(this,' + id + ')" src="' + url + '" /></div>');
+                                //changeImage(curImg,id);
+                                //console.log(getOriginalWidthOfImg(curImg[0]));
+
+                                //function getImgSize(imgSrc) {
+                                var newImg = new Image();
+                                var height;
+                                var width;
+
+                                newImg.onload = function () {
+                                    height = newImg.height;
+                                    width = newImg.width;
+                                    //console.log('The image size is ' + width + '*' + height);
+                                    urls.push({
+                                        url: url,
+                                        width: width,
+                                        height: height
+                                    });
+                                };
+
+                                newImg.src = url; // this must be done AFTER setting onload
+                                //}
+
+                                //getImgSize(curImg[0]);
+
+                                /*for (var key in Object.keys(curImg[0])) {
+                                 console.log(key);
+                                 }*/
+                                //console.log(Object(curImg[0]).naturalWidth);
+
+
+                                //console.log('The image size is ' + width + '*' + height);
+
+
+
+                                $('#panelHolder').append(curDiv);
+
                                 id++;
                             });
                             //$('#previews').append('</div>');
@@ -171,18 +219,20 @@
                         });
             });
 
+            var urls = [];
             var image;
 
             function getOriginalWidthOfImg(img_element) {
+                console.log(img_element);
                 var t = new Image();
                 t.src = (img_element.getAttribute ? img_element.getAttribute("src") : false) || img_element.src;
-                return t.width;
+                return t.naturalWidth;
             }
 
             function getOriginalHeightOfImg(img_element) {
                 var t = new Image();
                 t.src = (img_element.getAttribute ? img_element.getAttribute("src") : false) || img_element.src;
-                return t.height;
+                return t.naturalHeight;
             }
 
             function toResize(array) {
@@ -191,8 +241,6 @@
                     array[i].form.transform("s2");
                     array[i].text.transform("s2");
                     array[i].check.transform("s2");
-
-
                 }
             }
 
@@ -281,8 +329,8 @@
 
                 currentReset();
 
-                console.log(objectsArray);
-                console.log(objects);
+                /*console.log(objectsArray);
+                 console.log(objects);*/
 
                 currentId = id;
 
@@ -376,7 +424,6 @@
 
 
 
-
             function draggable1() {
                 return {
                     //form: paper.circle(730, 30, 10).attr("fill", "#00ee99"),
@@ -407,8 +454,8 @@
                         //this.formLength < 0 ? this.formLength = 0 : null;
                         //console.log(this.formLength);
                         //console.log()
-                        
-                        paper.rect(this.text.getBBox().x, this.text.getBBox().y, this.text.getBBox().width, this.text.getBBox().height);
+
+                        //paper.rect(this.text.getBBox().x, this.text.getBBox().y, this.text.getBBox().width, this.text.getBBox().height);
 
 
                         this.form.attr('path', "m " + (canvas.offsetWidth - 120) + " 38 \n\
@@ -491,63 +538,107 @@
             };
 
 
-            function myFunction2() {
+            /*function myFunction2() {
 
                 var data = [];
-                var actual;
+                var actual = [];
+                var aux;
 
-                /*var getPath = function(path){
-                 
-                 Raphael.transformPath(this.attr('path'), transform);
-                 
-                 };*/
 
-                for (var i = 0; i < objects.length; i++) {
-                    var boxForm = objects[i].form.getBBox();
-                    var boxText = objects[i].text.getBBox();
-                    actual = {
-                        formPath: Raphael.transformPath(objects[i].form.attr('path'), objects[i].form.attr('transform')),
-                        formX: boxForm.x,
-                        formY: boxForm.y,
-                        formColor: objects[i].form.attr('fill'),
-                        formCursor: 'pointer',
-                        textPath: objects[i].text.attr('text'),
-                        textX: boxText.x + boxText.width / 2,
-                        textY: boxText.y + boxText.height / 2,
-                        textCursor: 'pointer'
+
+                for (var i = 0; i < objectsArray.length; i++) {
+                    console.log(objectsArray[i].objects.length);
+                    aux = {
+                        id: "image",
+                        url: urls[i].url,
+                        width: urls[i].width,
+                        height: urls[i].height
                     };
+                    actual.push(aux);
+
+                    for (var j = 0; j < objectsArray[i].objects.length; j++) {
+                        var boxForm = objectsArray[i].objects[j].form.getBBox();
+                        var boxText = objectsArray[i].objects[j].text.getBBox();
+                        var boxState = objectsArray[i].objects[j].check.getBBox();
+                        aux = {
+                            id: "object",
+                            formPath: Raphael.transformPath(objectsArray[i].objects[j].form.attr('path'), objectsArray[i].objects[j].form.attr('transform')),
+                            formX: boxForm.x,
+                            formY: boxForm.y,
+                            formColor: objectsArray[i].objects[j].form.attr('fill'),
+                            formCursor: 'pointer',
+                            textPath: objectsArray[i].objects[j].text.attr('text'),
+                            textX: boxText.x + boxText.width / 2,
+                            textY: boxText.y + boxText.height / 2,
+                            textCursor: 'pointer',
+                            stateX: boxState.x,
+                            stateY: boxState.y
+                        };
+
+                        //console.log(actual.formPath);
+                        //JSON.stringify(actual);
+
+                        actual.push(aux);
+                    }
                     data.push(actual);
+                    actual = [];
                     //paper.rect(boxText.x, boxText.y, boxText.width, boxText.height);
                     //paper.text(actual.textX, actual.textY, actual.textPath);
                 }
 
-                console.log(data);
+                var blob = new Blob([JSON.stringify(data)], {type: "text/plain;charset=utf-8"});
+                saveAs(blob, "Base.txt");
 
+                console.log("Data: " + JSON.stringify(data));
+            }*/
+            
+            
+            function myFunction2() {
 
-                console.log("Objectos antes:", objects.length);
-                for (var i = 0; i < objects.length; i++) {
-                    //exclude(currentObjects[i], objects);
-                    remove(objects[i]);
-                    //currentObjects.splice(i,1);
-                }
-                objects = [];
-                console.log("Objectos después:", objects.length);
-                currentReset();
-
-                var newObjects = [];
-
-                var element;
-                for (var i = 0; i < data.length; i++) {
-                    element = {
-                        form: paper.path(data[i].formPath).attr({'fill': data[i].formColor, 'cursor': data[i].formCursor}),
-                        text: paper.text(data[i].textX, data[i].textY, data[i].textPath).attr({'cursor': data[i].textCursor})
+                var data = [];
+                var actual = [];
+                var aux, node = 0;
+                
+                for (var i = 0; i < objectsArray.length; i++) {
+                    console.log(objectsArray[i].objects.length);
+                    aux = {
+                        id: "image",
+                        url: urls[i].url,
+                        width: urls[i].width,
+                        height: urls[i].height
                     };
-                    glowable(element);
-                    newObjects.push(element);
+                    actual.push(aux);
+                    node = 0;
+
+                    for (var j = 0; j < objectsArray[i].objects.length; j++) {
+                        var boxForm = objectsArray[i].objects[j].form.getBBox();
+                        var boxText = objectsArray[i].objects[j].text.getBBox();
+                        var boxState = objectsArray[i].objects[j].check.getBBox();
+                        aux = {
+                            id: "object",
+                            formPath: Raphael.transformPath(objectsArray[i].objects[j].form.attr('path'), objectsArray[i].objects[j].form.attr('transform')),
+                            formX: boxForm.x,
+                            formY: boxForm.y,
+                            formAttr: "{\"fill\":\"" + objectsArray[i].objects[j].form.attr('fill') + "\"}",
+                            textPath: objectsArray[i].objects[j].text.attr('text'),
+                            textX: boxText.x + boxText.width / 2,
+                            textY: boxText.y + boxText.height / 2,
+                            textAttr: "{}",
+                            stateX: boxState.x,
+                            stateY: boxState.y,
+                            node: node
+                        };
+                        node++;
+                        actual.push(aux);
+                    }
+                    data.push(actual);
+                    actual = [];
                 }
 
-                //$('<a href="data:' + data + '" download="data.json">download JSON</a>').appendTo('glasspane');
-                //document.getElementById('buttonSave').href = makeTextFile(getElementById('buttonSave').value);
+                var blob = new Blob([JSON.stringify(data)], {type: "text/plain;charset=utf-8"});
+                saveAs(blob, "Base.txt");
+
+                console.log("Data: " + JSON.stringify(data));
             }
 
             /*var unDoCount = -1;
@@ -769,6 +860,22 @@
                 obj.form.drag(move, start, up);
                 obj.text.drag(move, start, up);
             };
+
+
+            /*var copyable2 = function (obj) {
+             
+             var callback = function (obj, ft, event) {
+             if (event.indexOf("drag start") !== -1) {
+             var copy = cloneObj(obj);
+             copy.check.show();
+             currentReset();
+             currentAdd(copy);
+             }
+             
+             if ()
+             }
+             
+             };*/
 
             var copyable = function (obj) {
                 //var copy = cloneObj(obj);

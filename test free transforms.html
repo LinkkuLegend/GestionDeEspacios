@@ -1,0 +1,126 @@
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <script src="raphael-2.1.2.js"></script>
+        <script src="jquery-1.11.3.min.js"></script>
+        <script src="jquery.liteuploader.js"></script>
+        <script src="raphael.free_transform.js"></script>
+        <script src="FileSaver.min.js"></script>
+
+        <title>Gestión de espacio - Administración</title>
+
+        <style>
+            text {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                //user-select: none;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div id="main">
+            <h2>Bienvenido al servicio de creación de espacios para la gestión</h2>
+
+
+            <div class="canvas" id="canvas1"></div>
+            <button id='buttonText' onclick="myFunction()">Cambiar</button>
+        </div>
+
+
+        <script>
+
+            var paper = Raphael("canvas1", 500, 500);
+            var objects = [];
+            /* function p1 = {
+             form : 
+             }*/
+
+            /*var ft = {
+             form: paper.freeTransform(paper.rect(10, 10, 100, 100).attr('fill': 'blue')),
+             text: paper.freeTransform(paper.text(10, 10, "Text"))
+             };*/
+
+
+            var obj1Base = {
+                form: paper.freeTransform(paper.rect(10, 10, 50, 50).attr({'fill': 'lightblue', 'cursor': 'pointer'}), {}, function (ft, events) {
+                    console.log(events);
+                    if (events.indexOf('apply') !== -1) {
+                        
+                        console.log("Hola?");
+                        obj1();
+                    }
+                    
+                    
+                }),
+                text: paper.freeTransform(paper.text(35, 35, "Text").attr({'cursor': 'pointer'}), {drag: false}, function (ft, events) {
+                    /*if (events.indexOf('drag start') !== -1) {
+                        //console.log(Object.keys(ft));
+                        obj1();
+                    }*/
+                })
+            };
+
+            function obj1() {
+                var obj1r= {
+                    form: paper.freeTransform(paper.rect(20, 20, 50, 50).attr({'fill': 'lightblue', 'cursor': 'pointer'}), {}, function (ft, events) {
+                        //console.log(ft.attrs + " " + events);
+                        /*if (events.indexOf('drag start') !== -1) {
+                            obj1rr.text.attrs.translate.x = ft.attrs.translate.x;
+                            obj1rr.text.attrs.translate.y = ft.attrs.translate.y;
+                            obj1rr.text.apply();
+                        }*/
+                    })
+                   /* text: paper.freeTransform(paper.text(35, 35, "Text").attr({'cursor': 'pointer'}), {}, function (ft, events) {
+                        if (events.indexOf('drag start') !== -1) {
+                            //console.log(Object.keys(ft));
+                            obj1r.form.attrs.translate.x = ft.attrs.translate.x;
+                            obj1r.form.attrs.translate.y = ft.attrs.translate.y;
+                            obj1r.form.apply();
+                        }
+                    })*/
+                };
+
+
+
+                return  obj1r;
+            }
+
+            var state = true;
+            function myFunction() {
+                if (state) {
+                    obj1.form.hideHandles({undrag: false});
+                    obj1.text.hideHandles({undrag: false});
+                } else {
+                    obj1.form.showHandles();
+                    obj1.text.showHandles();
+                }
+
+                state = state === true ? false : true;
+            }
+
+
+
+
+
+
+
+
+
+            //obj1.form.setOpts({drag: ['self']});
+            //obj1.text.setOpts({drag: ['self']});
+            //text.setOpts({'drag': ['self']);
+            //var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
+            //saveAs(blob, "hello world.txt");
+
+
+        </script>
+
+
+    </body>
+</html>
+
